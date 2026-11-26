@@ -63,7 +63,7 @@ class ProdukCubit extends Cubit<ProdukState> {
     emit(state.copyWith(daftarProduk: daftar));
   }
 
-  /// #ResetContoh — Mengembalikan stok ke 4 data contoh awal lalu memperbarui layar.
+  /// #ResetContoh — Mengembalikan stok ke 10 data contoh awal lalu memperbarui layar.
   Future<void> resetKeDataAwal() async {
     final daftar = await _service.resetDataAwal();
     emit(state.copyWith(daftarProduk: daftar));

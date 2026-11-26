@@ -29,6 +29,25 @@ class ItemKeranjang extends Equatable {
     );
   }
 
+  /// #KeMap — Mengubah 1 baris item belanja menjadi `Map` agar bisa disimpan ke dalam JSON struk.
+  /// Menyimpan "snapshot" nama & harga produk saat transaksi terjadi (mirip tabel
+  /// `transaction_items` di MySQL/Laravel) supaya riwayat struk lama tidak berubah
+  /// walaupun harga barang di masa depan dinaikkan.
+  Map<String, dynamic> toMap() {
+    return {
+      'produk': produk.toMap(),
+      'qty': qty,
+    };
+  }
+
+  /// #DariMap — Membentuk kembali `ItemKeranjang` dari data JSON struk yang tersimpan.
+  factory ItemKeranjang.fromMap(Map<String, dynamic> map) {
+    return ItemKeranjang(
+      produk: Produk.fromMap(Map<String, dynamic>.from(map['produk'] as Map)),
+      qty: map['qty'] as int,
+    );
+  }
+
   @override
   List<Object?> get props => [produk, qty];
 }
