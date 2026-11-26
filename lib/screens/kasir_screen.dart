@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import '../core/format_rupiah.dart';
 import '../cubit/produk_cubit.dart';
 import '../cubit/produk_state.dart';
+import '../cubit/riwayat_cubit.dart';
 import '../getx/kasir_controller.dart';
 import '../models/produk.dart';
 import '../widgets/keranjang_panel.dart';
 import '../widgets/placeholder_view.dart';
+import '../widgets/struk_dialog.dart';
 
 /// #HalamanKasir — Tempat memilih barang dan menghitung pembayaran secara reaktif.
 ///
@@ -36,22 +38,33 @@ class KasirScreen extends StatelessWidget {
     BuildContext context,
     KasirController kasir,
   ) async {
-    final cubit = context.read<ProdukCubit>();
-    final messenger = ScaffoldMessenger.of(context);
+    final produkCubit = context.read<ProdukCubit>();
+    final riwayatCubit = context.read<RiwayatCubit>();
 
-    // Salin isi keranjang sebelum direset supaya bisa dikirim ke ProdukCubit.
+    // Ambil snapshot nilai transaksi sebelum keranjang GetX dikosongkan.
     final itemDibeli = kasir.keranjang.toList();
-    final total = FormatRupiah.dari(kasir.totalBayar);
-    final kembali = FormatRupiah.dari(kasir.selisihBayar);
+    final subtotal = kasir.subtotal;
+    final diskonPersen = kasir.diskonPersen.value;
+    final nominalDiskon = kasir.nominalDiskon;
+    final totalBayar = kasir.totalBayar;
+    final uangBayar = kasir.uangBayar.value;
+    final kembalian = kasir.selisihBayar;
 
     kasir.kosongkanTransaksi();
-    await cubit.kurangiStokSetelahTransaksi(itemDibeli);
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text('Transaksi $total berhasil! Kembalian: $kembali'),
-      ),
+    await produkCubit.kurangiStokSetelahTransaksi(itemDibeli);
+    final nota = await riwayatCubit.catatTransaksi(
+      items: itemDibeli,
+      subtotal: subtotal,
+      diskonPersen: diskonPersen,
+      nominalDiskon: nominalDiskon,
+      totalBayar: totalBayar,
+      uangBayar: uangBayar,
+      kembalian: kembalian,
     );
+
+    if (!context.mounted) return;
+    await StrukDialog.tampilkan(context, nota);
   }
 
   @override

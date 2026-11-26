@@ -110,27 +110,31 @@ class StokScreen extends StatelessWidget {
             );
           }
 
+          // #HeaderTetap — `Column` memisahkan banner ringkasan di atas (diam/sticky)
+          // dengan `Expanded(child: ListView.builder)` di bawah yang bisa digulir sendiri.
+          // Mirip `flex-direction: column` + `flex: 1; overflow-y: auto` di CSS!
           return Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
-              child: ListView.builder(
-                // Padding bawah ekstra supaya kartu paling bawah tidak tertutup tombol apung.
-                // Item ke-0 adalah banner ringkasan stok, sisanya kartu produk.
-                padding: const EdgeInsets.fromLTRB(0, 4, 0, 88),
-                itemCount: state.daftarProduk.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return RingkasanStokBanner(
-                      daftarProduk: state.daftarProduk,
-                    );
-                  }
-                  final produk = state.daftarProduk[index - 1];
-                  return ProdukTile(
-                    produk: produk,
-                    onUbah: () => _bukaFormUbah(context, produk),
-                    onHapus: () => _konfirmasiHapus(context, produk),
-                  );
-                },
+              child: Column(
+                children: [
+                  RingkasanStokBanner(daftarProduk: state.daftarProduk),
+                  Expanded(
+                    child: ListView.builder(
+                      // Padding bawah ekstra supaya kartu paling bawah tidak tertutup tombol apung.
+                      padding: const EdgeInsets.fromLTRB(0, 4, 0, 88),
+                      itemCount: state.daftarProduk.length,
+                      itemBuilder: (context, index) {
+                        final produk = state.daftarProduk[index];
+                        return ProdukTile(
+                          produk: produk,
+                          onUbah: () => _bukaFormUbah(context, produk),
+                          onHapus: () => _konfirmasiHapus(context, produk),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           );

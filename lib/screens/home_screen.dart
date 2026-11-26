@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 
 import '../cubit/produk_cubit.dart';
+import '../cubit/riwayat_cubit.dart';
+import '../cubit/riwayat_state.dart';
 import '../getx/kasir_controller.dart';
 import 'kasir_screen.dart';
+import 'riwayat_screen.dart';
 import 'stok_screen.dart';
 
-/// #RumahAplikasi — Kerangka utama dengan AppBar & menu bawah (bottom navigation).
+/// #RumahAplikasi — Kerangka utama dengan AppBar & menu bawah 3 tab (Stok, Kasir, Riwayat).
 /// Mirip `layout.php` di PHP: isi halaman berganti-ganti, tetapi menu dan
 /// kerangkanya tetap sama.
 class HomeScreen extends StatefulWidget {
@@ -20,13 +23,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
-  static const List<String> _judul = ['Stok Barang', 'Kasir'];
+  static const List<String> _judul = [
+    'Stok Barang',
+    'Kasir',
+    'Riwayat Transaksi',
+  ];
 
   void _gantiTab(int index) {
     setState(() => _index = index);
   }
 
-  /// #KonfirmasiReset — Mengembalikan 4 barang contoh awal jika pengguna ingin mulai ulang latihan.
+  /// #KonfirmasiReset — Mengembalikan 10 barang contoh awal jika pengguna ingin mulai ulang latihan.
   Future<void> _konfirmasiResetContoh(BuildContext context) async {
     final cubit = context.read<ProdukCubit>();
     final kasir = Get.find<KasirController>();
@@ -37,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (dialogCtx) => AlertDialog(
         title: const Text('Reset Data Contoh?'),
         content: const Text(
-          'Daftar stok akan dikembalikan ke 4 barang awal dan keranjang dikosongkan.',
+          'Daftar stok akan dikembalikan ke 10 barang awal dan keranjang dikosongkan.',
         ),
         actions: [
           TextButton(
@@ -78,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: IndexedStack(
         index: _index,
-        children: const [StokScreen(), KasirScreen()],
+        children: const [StokScreen(), KasirScreen(), RiwayatScreen()],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
@@ -90,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Stok',
           ),
           NavigationDestination(
-            // #LencanaTabKasir — Menampilkan angka total item keranjang secara live memakai `Obx`.
+            // #LencanaTabKasir — Angka jumlah item keranjang secara live memakai `Obx` (GetX).
             icon: _IkonKasirBerlencana(
               kasir: kasir,
               ikon: Icons.point_of_sale_outlined,
@@ -100,6 +107,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ikon: Icons.point_of_sale,
             ),
             label: 'Kasir',
+          ),
+          const NavigationDestination(
+            // #LencanaTabRiwayat — Angka jumlah nota tersimpan memakai `BlocBuilder` (Cubit).
+            icon: _IkonRiwayatBerlencana(ikon: Icons.receipt_long_outlined),
+            selectedIcon: _IkonRiwayatBerlencana(ikon: Icons.receipt_long),
+            label: 'Riwayat',
           ),
         ],
       ),
@@ -126,5 +139,25 @@ class _IkonKasirBerlencana extends StatelessWidget {
         child: Icon(ikon),
       );
     });
+  }
+}
+
+class _IkonRiwayatBerlencana extends StatelessWidget {
+  const _IkonRiwayatBerlencana({required this.ikon});
+
+  final IconData ikon;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RiwayatCubit, RiwayatState>(
+      builder: (context, state) {
+        final jumlahNota = state.daftarTransaksi.length;
+        return Badge(
+          isLabelVisible: jumlahNota > 0,
+          label: Text('$jumlahNota'),
+          child: Icon(ikon),
+        );
+      },
+    );
   }
 }

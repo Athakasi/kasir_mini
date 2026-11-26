@@ -3,9 +3,9 @@ import 'package:kasir_mini/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// #TesDasar — Satu file tes sederhana & ringkas agar `flutter test` di GitHub Actions tetap hijau.
-/// Memastikan ringkasan stok (Cubit) muncul dan barang bisa dimasukkan ke keranjang (GetX).
+/// Memastikan ketiga tab (Stok, Kasir, Riwayat) beserta Cubit & GetX berjalan lancar.
 void main() {
-  testWidgets('Stok Cubit tampil dan keranjang GetX merespons klik barang', (
+  testWidgets('Tiga tab utama tampil dan keranjang GetX merespons klik barang', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -21,7 +21,10 @@ void main() {
 
     await tester.tap(find.text('Kopi Susu Gula Aren'));
     await tester.pump();
+    expect(find.text('1 dipilih'), findsOneWidget);
 
-    expect(find.text('Keranjang (1 jenis)'), findsOneWidget);
+    await tester.tap(find.text('Riwayat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Belum ada riwayat transaksi'), findsOneWidget);
   });
 }

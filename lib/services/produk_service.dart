@@ -13,12 +13,18 @@ class ProdukService {
 
   static const String _kunciSimpan = 'daftar_produk_v1';
 
-  /// #DataContoh — Dipakai sekali saja saat aplikasi pertama kali diinstal/dibuka.
+  /// #DataContoh — 10 barang bawaan yang dipakai saat aplikasi pertama kali dibuka atau di-reset.
   static const List<Produk> _dataAwal = [
     Produk(id: 'p1', nama: 'Kopi Susu Gula Aren', harga: 18000, stok: 25),
     Produk(id: 'p2', nama: 'Teh Tarik Dingin', harga: 12000, stok: 30),
     Produk(id: 'p3', nama: 'Roti Bakar Cokelat', harga: 15000, stok: 15),
     Produk(id: 'p4', nama: 'Kentang Goreng', harga: 14000, stok: 20),
+    Produk(id: 'p5', nama: 'Es Cokelat Klasik', harga: 16000, stok: 22),
+    Produk(id: 'p6', nama: 'Matcha Latte Dingin', harga: 20000, stok: 18),
+    Produk(id: 'p7', nama: 'Pisang Goreng Keju', harga: 13000, stok: 16),
+    Produk(id: 'p8', nama: 'Mie Goreng Spesial', harga: 17000, stok: 20),
+    Produk(id: 'p9', nama: 'Nasi Ayam Sambal Matah', harga: 22000, stok: 12),
+    Produk(id: 'p10', nama: 'Air Mineral Dingin', harga: 5000, stok: 40),
   ];
 
   SharedPreferences? _prefs;
@@ -33,7 +39,7 @@ class ProdukService {
     final jsonMentah = prefs.getString(_kunciSimpan);
 
     if (jsonMentah == null) {
-      // Pertama kali dibuka: isi dengan 4 produk contoh lalu langsung simpan.
+      // Pertama kali dibuka: isi dengan 10 produk contoh lalu langsung simpan.
       _daftarProduk = List<Produk>.of(_dataAwal);
       await _simpanKeLokal();
     } else {
@@ -106,7 +112,7 @@ class ProdukService {
     return List<Produk>.unmodifiable(_daftarProduk);
   }
 
-  /// #ResetDataAwal — Mengembalikan daftar barang ke 4 produk contoh bawaan.
+  /// #ResetDataAwal — Mengembalikan daftar barang ke 10 produk contoh bawaan.
   /// Sangat berguna saat latihan/demo seperti perintah `php artisan migrate:fresh --seed`.
   Future<List<Produk>> resetDataAwal() async {
     _daftarProduk = List<Produk>.of(_dataAwal);
